@@ -17,7 +17,7 @@ SerialConsole::SerialConsole(const SerialConsoleConfig& cfg) : _config(cfg)
 
 	for(int i=0; i<_config.numCommands; i++){
 		Triggers[i] = nullptr;
-    HelpMsg[i] = nullptr;
+        HelpMsg[i] = nullptr;
 		Functions[i] = nullptr;
 	} 
 
@@ -126,7 +126,7 @@ void SerialConsole::Listen(){
 					_config.IO_Stream.println("\nConsole: Command not recognized.");
 					_config.IO_Stream.println("Available commands:");
 					for(int i=0; i<_config.numCommands; i++){
-						if(strcmp(Triggers[i], "") != 0){
+						if(Triggers[i] != nullptr){
 							_config.IO_Stream.print(" - ");_config.IO_Stream.println(Triggers[i]);
 						}
 					}

@@ -19,3 +19,31 @@ SerialConsole is very lightweight on ROM and RAM, can be configured to work with
 2) Extract the .zip to get a SerialConsole folder with all the contents from GitHub.
 3) Put that folder in your Arduino libraries folder (Document\Arduino\Libraries on windows).
 4) #include <SerialConsole.h> in your sketch. Check the BasicExample.ino for a quick start guide.
+
+## Useage
+Here is a simplified snippet from the BasicExample.ino to show how it works...
+```cpp
+#include <SerialConsole.h>
+
+SerialConsole console; // Create a SerialConsole object
+
+void setup(){
+	Serial.begin(9600);
+
+	/* ...some other setup stuff... */
+
+	// Add commands to the SerialConsole like this...
+	console.AddCommand("led_on", cmd_led_on, "Turn on the builtin LED.");
+}
+
+void loop(){
+	console.Listen(); // This goes in your main loop to process your commands
+}
+
+// Your commands call functions, which are set up like this...
+void cmd_led_on(){
+	digitalWrite(LED_BUILTIN, HIGH);
+}
+```
+
+There are more features shown in the examples, for working with arguments, and for customizing the console's behavior, appearance, and memory footprint.

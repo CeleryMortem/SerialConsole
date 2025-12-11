@@ -1,10 +1,12 @@
 /* SerialConsole.h
 
-license: MIT - 2025 - CeleryMortem
+license: MIT - 2025 - actuvon
 
 Description: Small and simple command line interface for Arduino boards.
 
 Initial Draft: 2020
+
+Useage: Check the README and examples on https://github.com/actuvon/SerialConsole
 
 TODO: Change to RAII types so that copying and moving are allowed, and I don't have to bag my own shit.
       Doing everything you want will probably require making the congig object a template so that

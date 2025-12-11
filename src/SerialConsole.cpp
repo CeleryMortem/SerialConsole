@@ -11,11 +11,8 @@ SerialConsole::SerialConsole(const SerialConsoleConfig& cfg) : _config(cfg)
 	_bufferIndex = -1;
 	_lastScanMillis = 0;
 
-	//Triggers = (const char**)malloc(_config.numCommands * sizeof(const char*));
-	//HelpMsg = (const char**)malloc(_config.numCommands * sizeof(const char*));
 	Triggers = new const char*[_config.numCommands];
 	HelpMsg  = new const char*[_config.numCommands];
-	//Functions = (Func*)malloc(_config.numCommands * sizeof(Func));
 	Functions = new Func[_config.numCommands];
 
 	for(int i=0; i<_config.numCommands; i++){
@@ -24,13 +21,10 @@ SerialConsole::SerialConsole(const SerialConsoleConfig& cfg) : _config(cfg)
 		Functions[i] = nullptr;
 	} 
 
-	//_commandBuffer = (char*)malloc(_config.maxFullLineLength + 1);
 	_commandBuffer = new char[_config.maxFullLineLength + 1];
 	_commandBuffer[0] = '\0';
 
-	//Arguments = (char**)malloc(_config.maxNumArgs * sizeof(char*));
 	Arguments = new char*[_config.maxNumArgs];
-	//for(int i=0; i<_config.maxNumArgs; i++) Arguments[i] = (char*)malloc(_config.maxArgLength + 1);
 	for(int i=0; i<_config.maxNumArgs; i++) Arguments[i] = new char[_config.maxArgLength + 1];
 }
 

@@ -4,22 +4,11 @@ license: MIT - 2025 - CeleryMortem
 
 Description: Small and simple command line interface for Arduino boards.
 
-Authored: 2020
+Initial Draft: 2020
 
-Modifications: 2025-11
-	-Refactoring
-	-Adding a SerialConsoleConfig struct
-	-Supporting SerialConsole construction with default values
-	-Created the AddCommand function for simpler command binding
-	-Adding allowance to use different streams
-	-Added configurability for delimiters, end-of-line characters, and the user prompt
-
-Modification: 2025-12
-	-Changed triggers and help messages to const char* to support better memory health
-	-Added a destructor
-	-Changed to new and delete instead of malloc
-	-TODO: We need something like reinterpret_cast<const __FlashStringHelper*> to help
-	 us allow users to use the F() macro for their helper strings. Right now this explodes?
+TODO: Change to RAII types so that copying and moving are allowed, and I don't have to bag my own shit.
+      Doing everything you want will probably require making the congig object a template so that
+      size allocations can be compile-time constants. The config stuff will get messier.
 */
 
 #ifndef SerialConsole_h
@@ -59,6 +48,12 @@ class SerialConsole {
 		void AddCommand(const char* trigger, Func function, const char* helpMsg = nullptr);
 
 		void Listen(); // Check the serial port for traffic. Run commands if applicable.
+
+		// You aren't supposed to copy or move this class - the dynamic memory doesn't handle that.
+		SerialConsole(const SerialConsole&) = delete;
+		SerialConsole& operator=(const SerialConsole&) = delete;
+		SerialConsole(SerialConsole&&) = delete;
+		SerialConsole& operator=(SerialConsole&&) = delete;
 
 	private:
 		SerialConsoleConfig _config;

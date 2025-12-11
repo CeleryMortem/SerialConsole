@@ -11,9 +11,12 @@ SerialConsole::SerialConsole(const SerialConsoleConfig& cfg) : _config(cfg)
 	_bufferIndex = -1;
 	_lastScanMillis = 0;
 
-	Triggers = (char**)malloc(_config.numCommands * sizeof(char*));
-	HelpMsg = (char**)malloc(_config.numCommands * sizeof(char*));
-	Functions = (Func*)malloc(_config.numCommands * sizeof(Func));
+	//Triggers = (const char**)malloc(_config.numCommands * sizeof(const char*));
+	//HelpMsg = (const char**)malloc(_config.numCommands * sizeof(const char*));
+	Triggers = new const char*[_config.numCommands];
+	HelpMsg  = new const char*[_config.numCommands];
+	//Functions = (Func*)malloc(_config.numCommands * sizeof(Func));
+	Functions = new Func[_config.numCommands];
 
 	for(int i=0; i<_config.numCommands; i++){
 		Triggers[i] = nullptr;
@@ -21,14 +24,27 @@ SerialConsole::SerialConsole(const SerialConsoleConfig& cfg) : _config(cfg)
 		Functions[i] = nullptr;
 	} 
 
-	_commandBuffer = (char*)malloc(_config.maxFullLineLength + 1);
+	//_commandBuffer = (char*)malloc(_config.maxFullLineLength + 1);
+	_commandBuffer = new char[_config.maxFullLineLength + 1];
 	_commandBuffer[0] = '\0';
 
-	Arguments = (char**)malloc(_config.maxNumArgs * sizeof(char*));
-	for(int i=0; i<_config.maxNumArgs; i++) Arguments[i] = (char*)malloc(_config.maxArgLength + 1);
+	//Arguments = (char**)malloc(_config.maxNumArgs * sizeof(char*));
+	Arguments = new char*[_config.maxNumArgs];
+	//for(int i=0; i<_config.maxNumArgs; i++) Arguments[i] = (char*)malloc(_config.maxArgLength + 1);
+	for(int i=0; i<_config.maxNumArgs; i++) Arguments[i] = new char[_config.maxArgLength + 1];
 }
 
-void SerialConsole::AddCommand(char* trigger, Func function, char* helpMsg){
+SerialConsole::~SerialConsole(){
+	for(int i=0; i<_config.maxNumArgs; i++) delete[] Arguments[i];
+	
+	delete[] Arguments;
+	delete[] _commandBuffer;
+	delete[] Functions;
+	delete[] HelpMsg;
+	delete[] Triggers;
+}
+
+void SerialConsole::AddCommand(const char* trigger, Func function, const char* helpMsg){
 	if(_numCommandsDefined < _config.numCommands){
 		int commandNumber = _numCommandsDefined++;
 

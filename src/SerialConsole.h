@@ -13,6 +13,13 @@ Modifications: 2025-11
 	-Created the AddCommand function for simpler command binding
 	-Adding allowance to use different streams
 	-Added configurability for delimiters, end-of-line characters, and the user prompt
+
+Modification: 2025-12
+	-Changed triggers and help messages to const char* to support better memory health
+	-Added a destructor
+	-Changed to new and delete instead of malloc
+	-TODO: We need something like reinterpret_cast<const __FlashStringHelper*> to help
+	 us allow users to use the F() macro for their helper strings. Right now this explodes?
 */
 
 #ifndef SerialConsole_h
@@ -42,13 +49,14 @@ class SerialConsole {
 	public:
 		char** Arguments; // A pointer to the array of arguments
 
-		char** Triggers; // A pointer to the array of command string triggers
-		Func* Functions; // A pointer to the array of command functions
-    	char** HelpMsg;  // A pointer to the array of help messages
+		const char** Triggers; // A pointer to the array of command string triggers
+		Func* Functions;       // A pointer to the array of command functions
+    	const char** HelpMsg;  // A pointer to the array of help messages
 
 		SerialConsole(const SerialConsoleConfig& cfg = SerialConsoleConfig());
+		~SerialConsole();
 
-		void AddCommand(char* trigger, Func function, char* helpMsg = nullptr);
+		void AddCommand(const char* trigger, Func function, const char* helpMsg = nullptr);
 
 		void Listen(); // Check the serial port for traffic. Run commands if applicable.
 

@@ -16,10 +16,12 @@ SerialConsole is very lightweight on ROM and RAM, can be configured to work with
 ## Features
 There are already tools like this out there. Why did I make a new one? Well, there are some features and values that I feel are core to a good terminal, that seemed to be missing in existing libraries.
 * **Precise RAM Control (Fixed Memory Footprint):** Uses the SerialConsoleConfig structure to allow you to precisely define the maximum number of commands, maximum command length, and maximum arguments. This lets you tune the memory footprint to your exact RAM budget on small microcontrollers.
+* **Efficient Argument Parsing:** Arguments are parsed in-place within a fixed buffer. Command functions receive direct pointers to the indexed arguments (console.Arguments[i]) and the argument count (console.ArgCount).
 * **Built-in Help System:** Includes automatic command listing for unrecognized inputs and a structured help \<command> function to display optional command-specific helper messages. Error handling is clean and error messsages make sense.
 * **Integrated Polling Timer:** Uses millis() internally to allow you to set a configurable poll rate (scanPeriod_ms) without adding any timing complexity to your main loop().
 * **Bite Sized:** Good clean readability in the .h and .cpp files, and a very small code base so it's easy to read, understand, and fork.
-* **Configurable:** The SerialConsoleConfig structure makes it easy to make the SerialConsole act however you want it to. The IO_Stream can be changed from the Arduino Serial class to another one. Delimiters or line terminators can be adjusted. The ">> " prompter can also be changed.
+* **Stream Agnostic:** The IO_Stream can be changed from the default Serial class to any other Arduino Stream object (e.g., Serial1, SoftwareSerial).
+* **Custom Interface:** Delimiters, line terminators, and the command prompter (>>) are all fully adjustable via the config struct.
 
 ## Useage
 Here is a simplified snippet from the BasicExample.ino to show how it works...
@@ -34,9 +36,9 @@ void setup(){
 	/* ...some other setup stuff... */
 
 	// Add commands to the SerialConsole like this...
-	console.AddCommand("led_on", cmd_led_on, "Turn on the builtin LED.");
-	// This lets the user type in "led_on" in the Serial Monitor, and then the builtin LED will turn on!
-	// The description at the end shows up if you type "help led_on".
+	console.AddCommand("setpin", cmd_setpin, "Turn a digital output pin on or off"); 
+	// This lets the user type in "setpin 13 1" in the Serial Monitor, and then the builtin LED will turn on!
+	// The description at the end shows up if you type "help setpin".
 }
 
 void loop(){
@@ -44,8 +46,19 @@ void loop(){
 }
 
 // Your commands call functions, which are set up like this...
-void cmd_led_on(){
-	digitalWrite(LED_BUILTIN, HIGH);
+void cmd_setpin(){
+	// Check if you have the right number of arguments
+	if(console.ArgCount != 3) Serial.println("ERROR: Must specify a pin and a state to set it to.");
+
+	// Arguments[0] is the command name ("setpin")	
+	int arg1 = String(console.Arguments[1]).toInt(); // Arguments[1] is the first argument (e.g., "13")
+	int arg2 = String(console.Arguments[2]).toInt(); // Arguments[2] is the second argument (e.g., "1")
+
+	if(arg1 > 0) pinMode(arg1, OUTPUT);
+	else Serial.println("ERROR: The pin can not be negative.");
+
+	if(arg2 == 0 || arg2 == 1) digitalWrite(arg1, arg2);
+	else Serial.println("ERROR: Must set the pin to either 0 or 1.");
 }
 ```
 

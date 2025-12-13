@@ -13,7 +13,9 @@ Try entering these commands...
 >> help hello
 >> help led
 >> led
->> add 1.2 3.4
+>> help setpin
+>> setpin 13 0
+>> setpin 13 1
 
 */
 
@@ -38,8 +40,8 @@ void setup(){
 
   // Bind a new command to the console
   console.AddCommand("hello", cmd_hello, "Greet your Arduino! (this is a description/help message for a command)");
-  console.AddCommand("add", cmd_add); // Commands can be created without a help message, but this makes them very sad
-  console.AddCommand("led", cmd_LED, "Toggle the builtin LED on and off.");
+  console.AddCommand("setpin", cmd_setpin, "Turn a digital output pin on or off\nsetpin <pinNumber> <1 or 0>"); 
+  console.AddCommand("led", cmd_LED); // Commands can be created without a help message, but this makes them very sad
 }
 
 void loop(){
@@ -61,14 +63,17 @@ void cmd_LED(){
 }
 
 // Utilize arguments from the command line
-void cmd_add(){
-	// Arguments are designed for use as lightweight c strings, but can easily work with Arduino string functions
-	float arg1 = String(console.Arguments[1]).toFloat(); 
-	float arg2 = String(console.Arguments[2]).toFloat();
+void cmd_setpin(){
+	// Check if you have the right number of arguments
+	if(console.ArgCount != 3) Serial.println("ERROR: Must specify a pin and a state to set it to.");
 
-	Serial.print(arg1);
-	Serial.print(" + ");
-	Serial.print(arg2);
-	Serial.print(" = ");
-	Serial.println(arg1 + arg2);
+	// Arguments[0] is the command name ("setpin")	
+	int arg1 = String(console.Arguments[1]).toInt(); // Arguments[1] is the first argument (e.g., "13")
+	int arg2 = String(console.Arguments[2]).toInt(); // Arguments[2] is the second argument (e.g., "1")
+
+	if(arg1 > 0) pinMode(arg1, OUTPUT);
+	else Serial.println("ERROR: The pin can not be negative.");
+
+	if(arg2 == 0 || arg2 == 1) digitalWrite(arg1, arg2);
+	else Serial.println("ERROR: Must set the pin to either 0 or 1.");
 }

@@ -2,7 +2,18 @@
 
 Set up a basic serial console using Arduino Serial.
 
-Create a few commands to say hello and blink the built-in LED.
+Create a few commands to say hello, blink the built-in LED, and add 2 numbers.
+
+Upload this code and then open your Serial Monitor. Make sure the baud rate is set to 9600,
+and the "New Line" option is selected from the drop-down in the top right of the Serial Monitor.
+Type in "help" to see the list of commands.
+
+Try entering these commands...
+>> hello
+>> help hello
+>> help led
+>> led
+>> add 1.2 3.4
 
 */
 
@@ -28,7 +39,7 @@ void setup(){
   // Bind a new command to the console
   console.AddCommand("hello", cmd_hello, "Greet your Arduino! (this is a description/help message for a command)");
   console.AddCommand("add", cmd_add); // Commands can be created without a help message, but this makes them very sad
-  console.AddCommand("led", cmd_LED, "Toggle the builtin LED.");
+  console.AddCommand("led", cmd_LED, "Toggle the builtin LED on and off.");
 }
 
 void loop(){

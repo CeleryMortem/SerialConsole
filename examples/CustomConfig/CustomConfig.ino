@@ -1,8 +1,18 @@
-/* SerialConsole: BasicExample.ino
+/* SerialConsole: CustomConfig.ino
 
-Set up a basic serial console using Arduino Serial.
+Shows how to customize your SerialConsole object.
 
-Create a few commands to say hello and blink the built-in LED.
+NOTE: Since we change all the *normal* settings to something else, running this example is a bit weird.
+In the SerialMonitor you will have to change the line ending dropdown to "No Line Ending" or else the console will think
+that the line endings you send are a part of a command, and it will be very confused.
+
+With these settings, the SerialConsole won't care when you hit enter, it only cares when it sees a "|" or ";".
+So you can type:
+l <enter>
+e <enter>
+d <enter>
+; <enter>
+and the console will run the "led" command.
 
 */
 

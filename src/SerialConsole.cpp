@@ -44,10 +44,10 @@ void SerialConsole::AddCommand(const char* trigger, Func function, const char* h
         HelpMsg[commandNumber] = helpMsg;
     }
     else{
-        _config.IO_Stream.print("ERROR: Could not add command <");
+        _config.IO_Stream.print("SerialConsole: ERROR: Could not add command <");
         _config.IO_Stream.print(trigger);
         _config.IO_Stream.println("> because the SerialConsole is already full of commands!");
-        _config.IO_Stream.println("Please increase the number of commands in the SerialConsoleConfig before building the SerialConsole.");
+        _config.IO_Stream.println("Please increase the number of commands with a SerialConsoleConfig when building the SerialConsole. See examples.");
     }
 }
 
@@ -68,12 +68,16 @@ void SerialConsole::Listen(){
 
     // Check if a reasonable amount of time has passed since the last scan
     if(now - _lastScanMillis > _config.scanPeriod_ms){
-        if(_config.IO_Stream.available() > 0){
+        if(_config.IO_Stream.available()){
 
-            // Listen to the stream until a full command is received
+            // Read characters into the buffer until a line terminator is detected, or there's nothing left to read
             while(_config.IO_Stream.available()){
                 if(++_bufferIndex >= _config.maxFullLineLength){
-                    _config.IO_Stream.println("WARNING: Received a command that was longer than the max allowed line length. May need to change config settings.");
+                    _config.IO_Stream.println("\nSerialConsole: ERROR: Received a command that was longer than the max allowed line length, and had to flush the stream :(\nYou may need to change the max allowed line length config setting with a SerialConsoleConfig object. See examples.");
+                    while(_config.IO_Stream.available()){
+                    	char c = _config.IO_Stream.read();
+                    	if(c == _config.cmdTerminator1 || c == _config.cmdTerminator2) break;
+            		}
                     cleanSlate();
                     break;
                 }
@@ -106,21 +110,15 @@ void SerialConsole::Listen(){
                 _config.IO_Stream.println();
 
                 bool cmdFound = false;
-                if(strcmp(Arguments[0], "help") == 0){
-                    if(ArgCount <= 1){
-                        _config.IO_Stream.println("Type help <command> for help on a specific command.");
-                    }
-                    else{
-                        for(int i=0; i<_numCommandsDefined; i++){
-                            if(strcmp(Arguments[1], Triggers[i]) == 0) {
-                                cmdFound = true;
-                                if(HelpMsg[i] != nullptr) _config.IO_Stream.println(HelpMsg[i]);
-                                else{
-                                    _config.IO_Stream.print("Console: No help message available for command ");
-                                    _config.IO_Stream.print(i);
-                                    _config.IO_Stream.print(": ");
-                                    _config.IO_Stream.println(Triggers[i]);
-                                }
+                if(strcmp(Arguments[0], "help") == 0 && ArgCount > 1){
+                    for(int i=0; i<_numCommandsDefined; i++){
+                        if(strcmp(Arguments[1], Triggers[i]) == 0) {
+                            cmdFound = true;
+                            if(HelpMsg[i] != nullptr) _config.IO_Stream.println(HelpMsg[i]);
+                            else{
+                                _config.IO_Stream.print("SerialConsole: No help message available for command");
+                                _config.IO_Stream.print(": ");
+                                _config.IO_Stream.println(Triggers[i]);
                             }
                         }
                     }
@@ -130,22 +128,25 @@ void SerialConsole::Listen(){
                         if(strcmp(Arguments[0], Triggers[i]) == 0){
                             cmdFound = true;
 
-                            if(Functions[i] == nullptr) _config.IO_Stream.println("\nConsole: A function with an existing trigger was called, but there is no function associated with the trigger.");
+                            if(Functions[i] == nullptr) _config.IO_Stream.println("SerialConsole: A function with an existing trigger was called, but there is no function associated with the trigger.");
                             else (Functions[i])();
                         }
                     }
                 }
                 if(!cmdFound){
-                    _config.IO_Stream.print("\nConsole: Command <");_config.IO_Stream.print(Arguments[0]);_config.IO_Stream.println("> not recognized.");
+                    if(strcmp(Arguments[0], "help") != 0){
+                    	_config.IO_Stream.print("SerialConsole: Command """);
+                    	_config.IO_Stream.print(Arguments[0]);
+                    	_config.IO_Stream.println(""" not recognized.");
+                    }
+                    _config.IO_Stream.println("Type help <command> for help on a specific command.");
                     _config.IO_Stream.println("Available commands:");
                     for(int i=0; i<_numCommandsDefined; i++){
                         if(Triggers[i] != nullptr){
                             _config.IO_Stream.print(" - ");_config.IO_Stream.println(Triggers[i]);
                         }
                     }
-                    _config.IO_Stream.println("To get help info for a command, type ""help <command>""");
                 }
-
                 cleanSlate(); // Clean up buffer and arguments for the next command
             }
         }

@@ -11,7 +11,7 @@ Then you open up the Arduino Serial Monitor, type in LED, and watch it turn on!
 
 In the serial monitor, the console will tell you what the available commands are when you type anything in. If you type an unrecognized command, it will respond by listing out all the commands that are available. There is a builtin "help" function to display the optional helper messages that you put in when you add commands.
 
-SerialConsole is very lightweight on ROM and RAM, can be configured to work with any Arduino Stream object, and should run on any Arduino board that supports millis(). The .cpp file is less than 160 lines long.
+SerialConsole is very lightweight on ROM and RAM, can be configured to work with any Arduino Stream object, and should run on any Arduino board that supports millis(). The whole library is barely 200 lines long.
 
 ## Installation
 1) Click the green "Code" button at the top right of the page and download everything as a .zip.
@@ -51,9 +51,12 @@ There are more features shown in the examples, for working with arguments, and f
 
 ## Features
 There are already tools like this out there. Why did I make a new one? Well, none of them really suited me. I wanted a library that was very simple, but still fully met this list of features...
-* The ability to run functions from the Serial Monitor.
-* The ability to pass parameters to my functions from the Serial Monitor.
-* Very easy useage with 1 line to make the console, 1 line to add commands, and 1 line in the main loop.
-* An adjustable, predictable, clean memory footprint that doesn't move around - good for chips with baby RAMs, but expandable for bigger chips too.
-* A reasonably straightforward configuration tool to adjust all your settings.
-* Good clean readability in the .h and .cpp files, so you can walk in and own the place if you want to.
+* The ability to run functions with parameters from the Serial Monitor.
+* A language and interface that felt clean and natural in the IDE and in the console.
+* A configurable, predictable, clean, fixed memory footprint - friendly to small RAMs.
+* A built-in help function that lists all available commands.
+* A built-in per-command help function that reminds me how to use my commands after I've forgotten.
+* Decent error handling/helpful error messages.
+* A straightforward configuration tool to adjust all my settings.
+* It's own built-in timer so I can change its poll rate if I want to, without having to add any complexity.
+* Good clean readability in the .h and .cpp files, so I can walk in and own the place if I want to change it.

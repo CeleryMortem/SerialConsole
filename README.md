@@ -22,8 +22,31 @@ There are already tools like this out there. Why did I make a new one? Well, the
 * **Bite Sized:** Good clean readability in the .h and .cpp files, and a very small code base so it's easy to read, understand, and fork.
 * **Stream Agnostic:** The IO_Stream can be changed from the default Serial class to any other Arduino Stream object (e.g., Serial1, SoftwareSerial).
 * **Custom Interface:** Delimiters, line terminators, and the command prompter (>>) are all fully adjustable via the config struct.
+* **PuttyMode Support:** Built-in configuration for character-by-character terminals like PuTTY, VSCode, and other real terminal emulators with live character echo and backspace support.
 
-## Useage
+## Terminal Modes
+
+SerialConsole works in two modes:
+
+**Line Mode (default)** - For Arduino IDE Serial Monitor
+- Type commands in the text box at the top, press Enter to send
+- Full command is echoed back with `>>` prefix after you hit Enter
+- Best for: Arduino IDE Serial Monitor, basic serial terminals
+
+**PuttyMode** - For real terminal emulators
+- Characters appear as you type them (live echo)
+- Backspace works to delete characters
+- `>>` prompt shows when ready for input
+- Best for: PuTTY, VSCode Serial Monitor, Terminal/iTerm2, screen/minicom
+
+Enable PuttyMode with one line:
+```cpp
+SerialConsole console(PuttyMode());
+```
+
+See `examples/BasicExample` for line mode, and `examples/PuttyMode` for PuttyMode.
+
+## Usage
 Here is a simplified snippet from the BasicExample.ino to show how it works...
 ```cpp
 #include <SerialConsole.h>

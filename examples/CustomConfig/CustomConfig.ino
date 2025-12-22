@@ -25,22 +25,36 @@ const char* myInputPrompter = "\n☺:";
 const char* myDelimiter = "-";
 
 // Create a SerialConsole with custom configuration options...
-// NOTE: Since we screwed with the cmdTerminators, you will have to change the line ending option in the Serial Monitor
+// NOTE: Since we changed the cmdTerminators, you will have to change the line ending option in the Serial Monitor
 //       to "No Line Ending", and then you can try using the new, custom command terminators by entering things like:
 //       "hello|led;" which will run the "hello" command, wait 1 second, then run the "led" command
-//    
+//      This example will work particularly well in PuTTY.
 SerialConsole console(
     ([]() {
         SerialConsoleConfig cfg;
 
+        // Memory and capacity settings
         cfg.numCommands = 15;        // Set the maximum allowable number of commands that can be added to this SerialConsole object
         cfg.maxFullLineLength = 40;  // Shorten the maximum allowable length of a full command line with arguments, to save memory
         cfg.maxNumArgs = 10;         // Increase the number of arguments allowed in a command at the cost of RAM
-        cfg.cmdTerminator2 = ';';    // This is one of two chars you can use to mark the end of a command line
-        cfg.cmdTerminator1 = '|';    // In the default configuration this is \n, but you COULD change it
-        cfg.scanPeriod_ms = 1000;    // Wait at least 1000 milliseconds between Listen()ing or running commands
-        cfg.inputPrompter = "\n☺: "; // Customize the look of your SerialConsole
-        cfg.delimiter = '-';         // A delemiter other than a space can be set
+
+        // Parsing settings
+        cfg.cmdTerminator1 = '|';    // First character to mark the end of a command line (default: '\n')
+        cfg.cmdTerminator2 = ';';    // Second character to mark the end of a command line (default: '\r')
+        cfg.delimiter = '-';         // Character to separate arguments (default: ' ')
+
+        // Timing
+        cfg.scanPeriod_ms = 1000;    // Wait at least 1000 milliseconds between Listen() calls or running commands
+
+        // Display settings
+        cfg.inputPrompter = "\n☺: "; // Customize the prompt that appears when ready for input
+
+        // Terminal mode settings (see PuttyMode example for easier setup)
+        cfg.echoFullCommand = false;      // Echo the full command line after Enter is pressed (default: true, good for Arduino IDE)
+        cfg.echoIndividualChars = true; // Echo each character as it's typed (default: false, set true for PuTTY/VSCode)
+        cfg.showPromptWhenReady = true; // Show prompt when ready for input (default: false, set true for PuTTY/VSCode)
+
+        // Note: For PuTTY/terminal emulator mode, use PuttyMode() instead of manually setting these three options
 
         return cfg;
     })()

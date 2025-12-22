@@ -38,8 +38,8 @@ struct SerialConsoleConfig {
     SerialConsoleConfig(Stream& stm) : IO_Stream(stm) {} // but it can be changed
 };
 
-// Helper function to create a SerialConsoleConfig optimized for terminal emulators (PuTTY, pio device monitor, etc.)
-inline SerialConsoleConfig TerminalConfig(Stream& stream = Serial){
+// Helper function to create a SerialConsoleConfig optimized for PuTTY and other terminal emulators
+inline SerialConsoleConfig PuttyMode(Stream& stream = Serial){
     SerialConsoleConfig cfg(stream);
     cfg.echoFullCommand = false;       // Don't echo the full command (already echoed char-by-char)
     cfg.echoIndividualChars = true;    // Echo each character as it's typed

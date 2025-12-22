@@ -1,16 +1,17 @@
-/* SerialConsole: TerminalConfig.ino
+/* SerialConsole: PuttyMode.ino
 
-Demonstrates terminal mode for use with VSCode, PuTTY, or other terminal emulators
+Demonstrates PuttyMode for use with PuTTY, VSCode, or other terminal emulators
 where you type character-by-character rather than in a line-entry box.
 
-In terminal mode:
+In PuttyMode:
 - Characters are echoed back as you type them
+- Backspace works to delete characters
 - The prompt (>>) appears when ready for input
 - Full command echo is disabled (since you already saw it being typed)
 
 This is different from the Arduino IDE Serial Monitor which uses a text box for input.
 
-Upload this code and open your terminal (VSCode monitor, PuTTY, etc.).
+Upload this code and open your terminal (PuTTY, VSCode monitor, etc.).
 Type commands directly - you'll see characters appear as you type.
 
 Try entering these commands:
@@ -29,8 +30,8 @@ Try entering these commands:
 const int LedPin = LED_BUILTIN;
 bool PinState = false;
 
-// Create a SerialConsole with terminal configuration
-SerialConsole console(TerminalConfig());
+// Create a SerialConsole with PuttyMode configuration
+SerialConsole console(PuttyMode());
 
 void setup(){
 

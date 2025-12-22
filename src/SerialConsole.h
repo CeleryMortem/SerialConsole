@@ -1,8 +1,8 @@
 /* SerialConsole.h
-
-license: MIT - 2025 - actuvon
-
-Description: Small and simple command line interface for Arduino boards.
+ * SPDX-License-Identifier: MIT
+ * Copyright (c) 2025 Kaden Burgart (actuvon)
+ *
+ * Small and simple command line interface for Arduino boards.
 
 Initial Draft: 2020
 

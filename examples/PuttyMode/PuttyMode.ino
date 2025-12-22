@@ -1,6 +1,8 @@
 /* SerialConsole: PuttyMode.ino
-
-Demonstrates PuttyMode for use with PuTTY, VSCode, or other terminal emulators
+ * SPDX-License-Identifier: MIT
+ * Copyright (c) 2025 Kaden Burgart (actuvon)
+ *
+ * Demonstrates PuttyMode for use with PuTTY, VSCode, or other terminal emulators
 where you type character-by-character rather than in a line-entry box.
 
 In PuttyMode:

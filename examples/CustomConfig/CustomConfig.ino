@@ -1,6 +1,8 @@
 /* SerialConsole: CustomConfig.ino
-
-Shows how to customize your SerialConsole object.
+ * SPDX-License-Identifier: MIT
+ * Copyright (c) 2025 Kaden Burgart (actuvon)
+ *
+ * Shows how to customize your SerialConsole object.
 
 NOTE: Since we change all the *normal* settings to something else, running this example is a bit weird.
 In the SerialMonitor you will have to change the line ending dropdown to "No Line Ending" or else the console will think

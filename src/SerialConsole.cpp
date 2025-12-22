@@ -1,5 +1,6 @@
 /* SerialConsole.cpp
- * license: MIT - 2025 - actuvon
+ * SPDX-License-Identifier: MIT
+ * Copyright (c) 2025 Kaden Burgart (actuvon)
  */
 
 #include "Arduino.h"

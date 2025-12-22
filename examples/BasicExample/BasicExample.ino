@@ -1,6 +1,8 @@
 /* SerialConsole: BasicExample.ino
-
-Set up a basic serial console using Arduino Serial.
+ * SPDX-License-Identifier: MIT
+ * Copyright (c) 2025 Kaden Burgart (actuvon)
+ *
+ * Set up a basic serial console using Arduino Serial.
 
 Create a few commands to say hello, blink the built-in LED, and add 2 numbers.
 

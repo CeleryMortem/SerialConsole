@@ -6,10 +6,10 @@ Description: Small and simple command line interface for Arduino boards.
 
 Initial Draft: 2020
 
-Useage: Check the README and examples on https://github.com/actuvon/SerialConsole
+Usage: Check the README and examples on https://github.com/actuvon/SerialConsole
 
 TODO: Change to RAII types so that copying and moving are allowed, and I don't have to bag my own shit.
-      Doing everything you want will probably require making the congig object a template so that
+      Doing everything you want will probably require making the config object a template so that
       size allocations can be compile-time constants. The config stuff will get messier.
 */
 
@@ -25,15 +25,27 @@ struct SerialConsoleConfig {
     uint8_t maxFullLineLength = 50;     // maximum character count of any full command line (with arguments)
     uint8_t maxNumArgs = 7;             // maximum number of arguments allowed in a single command line
     char cmdTerminator1 = '\n';         // this character marks the end/submission of a command line
-    char cmdTerminator2 = '\r';         // an alternalte char to mark the end/submission of a command line
+    char cmdTerminator2 = '\r';         // an alternate char to mark the end/submission of a command line
     unsigned long scanPeriod_ms = 250;  // how long will the SerialConsole wait between two consecutive scans in ms
     Stream& IO_Stream;                  // you can change the type of stream the SerialConsole works with
     const char* inputPrompter = "\n>> ";// a little thingy to show the user they can type - can be modified
+    bool echoFullCommand = true;        // echo back the full command line after enter (Arduino IDE mode)
+    bool echoIndividualChars = false;   // echo back each character as it's received (terminal mode)
+    bool showPromptWhenReady = false;   // display input prompter when ready for input (terminal mode)
     char delimiter = ' ';               // arguments are seperated by a space by default
 
     SerialConsoleConfig() : IO_Stream(Serial) {} // The default IO stream is Serial...
     SerialConsoleConfig(Stream& stm) : IO_Stream(stm) {} // but it can be changed
 };
+
+// Helper function to create a SerialConsoleConfig optimized for terminal emulators (PuTTY, pio device monitor, etc.)
+inline SerialConsoleConfig TerminalConfig(Stream& stream = Serial){
+    SerialConsoleConfig cfg(stream);
+    cfg.echoFullCommand = false;       // Don't echo the full command (already echoed char-by-char)
+    cfg.echoIndividualChars = true;    // Echo each character as it's typed
+    cfg.showPromptWhenReady = true;    // Show >> prompt when ready for input
+    return cfg;
+}
 
 class SerialConsole {
     public:
@@ -62,9 +74,8 @@ class SerialConsole {
         uint8_t _numCommandsDefined; // How many commands have been added to this SerialConsole?
 
         unsigned long _lastScanMillis; // The millis() timestamp of the last scan
-        char* _commandBuffer; // Temporarilly holds incomming commands
+        char* _commandBuffer; // Temporarily holds incoming commands
         int _bufferIndex;
-        char* _currentArgStart;
 
         void cleanSlate();
 };

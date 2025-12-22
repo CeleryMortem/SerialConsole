@@ -23,8 +23,6 @@ SerialConsole::SerialConsole(const SerialConsoleConfig& cfg) : _config(cfg){
         Functions[i] = nullptr;
     } 
     _commandBuffer[0] = '\0';
-
-    _currentArgStart = _commandBuffer;
 }
 
 SerialConsole::~SerialConsole(){
@@ -55,13 +53,13 @@ void SerialConsole::AddCommand(const char* trigger, Func function, const char* h
 void SerialConsole::cleanSlate(){
     _commandBuffer[0] = '\0';
     _bufferIndex = -1;
-    _currentArgStart = _commandBuffer;
     ArgCount = 0;
 
     for(int i=0; i<_config.maxNumArgs; i++) Arguments[i] = _commandBuffer;
+    if(_config.showPromptWhenReady) _config.IO_Stream.print(_config.inputPrompter);
 }
 
-// Listen for incomming commands
+// Listen for incoming commands
 void SerialConsole::Listen(){
     unsigned long now = millis();
     bool execute = false;
@@ -84,30 +82,53 @@ void SerialConsole::Listen(){
 
                 _commandBuffer[_bufferIndex] = _config.IO_Stream.read();
 
-                if(_commandBuffer[_bufferIndex] == _config.delimiter && ArgCount < _config.maxNumArgs){
-                    Arguments[ArgCount++] = _currentArgStart;
-                    _commandBuffer[_bufferIndex] = '\0';
-                    _currentArgStart = _commandBuffer+_bufferIndex+1;
+                // Handle backspace
+                if(_commandBuffer[_bufferIndex] == 0x7F || _commandBuffer[_bufferIndex] == 0x08){
+                    if(_bufferIndex > 0){
+                        _bufferIndex--;
+                        if(_config.echoIndividualChars){
+                            _config.IO_Stream.print("\b \b");
+                        }
+                    }
+                    _bufferIndex--;
+                    continue;
                 }
-                else if(_commandBuffer[_bufferIndex] == _config.cmdTerminator1 || _commandBuffer[_bufferIndex] == _config.cmdTerminator2 || _commandBuffer[_bufferIndex] == '\0'){
-                    if(ArgCount < _config.maxNumArgs) Arguments[ArgCount++] = _currentArgStart;
-                    _commandBuffer[_bufferIndex] = '\0';
 
+                if(_config.echoIndividualChars) _config.IO_Stream.print(_commandBuffer[_bufferIndex]);
+
+                // Check for terminators
+                if(_commandBuffer[_bufferIndex] == _config.cmdTerminator1 || _commandBuffer[_bufferIndex] == _config.cmdTerminator2 || _commandBuffer[_bufferIndex] == '\0'){
+                    _commandBuffer[_bufferIndex] = '\0';
                     if(_bufferIndex > 0) execute = true;
-                    else cleanSlate();  // Don't execute if we're just getting end-of-line characters with no actual content
+                    else cleanSlate();
                     break;
                 }
             }
 
             // Maybe a whole command came in, but maybe we only got part of it and we have to wait until the next Listen() to get the rest
             if(execute){
-                // Print out the command we just read
-                _config.IO_Stream.print(_config.inputPrompter);
-                for(int i=0; i<ArgCount; i++) { 
-                    _config.IO_Stream.print(Arguments[i]);
-                    if(i<ArgCount-1) _config.IO_Stream.print(_config.delimiter);
+                // Parse arguments from the buffer
+                char* currentArgStart = _commandBuffer;
+                for(int i=0; i<=_bufferIndex; i++){
+                    if(_commandBuffer[i] == _config.delimiter || _commandBuffer[i] == '\0'){
+                        if(ArgCount < _config.maxNumArgs){
+                            Arguments[ArgCount++] = currentArgStart;
+                            _commandBuffer[i] = '\0';
+                            currentArgStart = _commandBuffer + i + 1;
+                        }
+                    }
                 }
-                _config.IO_Stream.println();
+
+                // Print out the command we just read (Arduino IDE mode)
+                if(_config.echoFullCommand){
+                    _config.IO_Stream.print(_config.inputPrompter);
+                    for(int i=0; i<ArgCount; i++){
+                        _config.IO_Stream.print(Arguments[i]);
+                        if(i<ArgCount-1) _config.IO_Stream.print(_config.delimiter);
+                    }
+                    _config.IO_Stream.println();
+                }
+                else _config.IO_Stream.println();
 
                 bool cmdFound = false;
                 if(strcmp(Arguments[0], "help") == 0 && ArgCount > 1){
@@ -150,7 +171,6 @@ void SerialConsole::Listen(){
                 cleanSlate(); // Clean up buffer and arguments for the next command
             }
         }
-
         _lastScanMillis = millis();
     }
 }
